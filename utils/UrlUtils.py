@@ -8,12 +8,27 @@ class UrlUtils:
       return True
     else :
       return False
+
+  @staticmethod
+  def isSameDomain(url, domain = TARGET_DOMAIN):
+    if url.startswith(domain):
+      return True
+    if url.startswith('/'):
+      return True
+    return False
     
   @staticmethod
-  def isAppendCondition(arr,link,domin = TARGET_DOMAIN):
+  def isAppendCondition(arr,link,domain = TARGET_DOMAIN):
+
+    def isEmail(_link):
+      return 'mailto' in _link
+    def isEmpty(_link):
+      return '#' == _link
+    def isRepeat(_arr, _link):
+      return _link in _arr
+      
     try:
-      url = link.attrs['href']
-      if 'href' in link.attrs and url not in arr and 'mailto' not in url and '#' != url and url.startswith(domin):
+      if not isRepeat(arr, link) and not isEmail(link) and not isEmpty(link) and UrlUtils.isSameDomain(link):
         return True
       else :
         return False

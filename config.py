@@ -1,4 +1,4 @@
 class Config:
-    TARGET_DOMAIN = "https://www.bbc.com"
-    CATEGORY_LIST = ['sport', 'author/', 'weather']
-    PROJECT_NAME = "bbc.com"
+    TARGET_DOMAIN = "https://www.bbc.co.uk"
+    CATEGORY_LIST = ['sport', 'weather']
+    PROJECT_NAME = "bbc"

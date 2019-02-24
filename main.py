@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 
 from utils.FileHelper import FileHelper
-from utils.Scraper import Scraper
+from utils.Scraper.ScraperScroll import ScraperScroll
 from utils.UrlUtils import UrlUtils
 from utils.Logger import Logger
 from config import Config
@@ -28,15 +28,18 @@ def init():
       processUrl('{0}/{1}'.format(TARGET_DOMAIN, subUrlTag))
 
 def processUrl(__url):
-  sp = Scraper(
+  sp = ScraperScroll(
     url = __url, 
     innerLinks = FileHelper.readFileToList(PATH_RESULT), 
     gtpLinks = FileHelper.readFileToList(PATH_GTP), 
+    options= {"domain": TARGET_DOMAIN}
   )
 
   sp.processLinks()
 
   print('[INFO] Found %d new allLinks' % len(sp.allLinks))
+  # for newlink in sp.allLinks:
+  #   print(newlink)
   print('[INFO] Found %d new newInnerLinks' % len(sp.newInnerLinks))
   print('[INFO] Found %d new newgtpLinks' % len(sp.newgtpLinks))
 
