@@ -9,8 +9,17 @@ from utils.UrlUtils import UrlUtils
 def joinList(arr1 = [], arr2 = []):
   return list(set( arr1 + arr2 ))
 
+def getHref(aTagObject):
+  try:
+    if hasattr(aTagObject.attr, 'href') or aTagObject.attrs['href']:
+      return aTagObject.attrs['href']
+    
+    return ''
+  except:
+    return ''
+
 class Scraper:
-  def __init__(self, url, innerLinks = [], gtpLinks = [], options = {}):
+  def __init__(self, url, innerLinks = [], gtpLinks = [], cookies= [], options = {}):
 
     self.url = url
     self.allAtagss = []
@@ -18,6 +27,7 @@ class Scraper:
     self.innerLinks = innerLinks
     self.gtpLinks = gtpLinks
     self.options = options
+    self.cookies = cookies
     self.newInnerLinks = []
     self.newgtpLinks = []
 
@@ -28,9 +38,24 @@ class Scraper:
   def preFetchHtml(self, driver):
     return
 
+  def initCookie (self, driver, url):
+    driver.get(url)
+    driver.delete_all_cookies()
+
+    cookies = self.cookies
+
+    if len(cookies) >= 1:
+      for c in cookies:
+        driver.add_cookie({'name': c[0],'value': c[1]})
+
+    return
+
+
   def fetchHtml (self):
     url =  '{0}{1}'.format(self.options["domain"], self.url) if self.url.startswith('/') else self.url
     driver = webdriver.Remote("http://127.0.0.1:4444/wd/hub", DesiredCapabilities.CHROME)
+
+    self.initCookie(driver, url)
 
     driver.get(url)
     print('[INFO] processing %s' % url)
@@ -38,6 +63,11 @@ class Scraper:
     self.preFetchHtml(driver)
     html = driver.page_source
     driver.quit()
+
+    f = open('helloworld.html','a')
+    f.write(html)
+    f.close()
+
     return html
 
   # @staticmethod
@@ -52,15 +82,19 @@ class Scraper:
     allAtags = self.parseHtml(html)
     self.allAtags = allAtags
 
+    print('-=-=-=-= 1 -=-=-=-=')
+    # print(allAtags)
 
     self.allLinks = []
     for item in allAtags:
-      if hasattr(item.attr, 'href'):
-        self.allLinks.append(item.attrs['href'])
+      href = getHref(item)
+
+      if href and href.strip(): # not empty string
+        self.allLinks.append(href)
 
     self.allLinks = joinList(self.allLinks, []) # unique
-
     self.newInnerLinks = list(filter(lambda link: UrlUtils.isAppendCondition(arr = innerLinks, link = link), self.allLinks))
+
     self.newgtpLinks = list(filter(
       lambda link: UrlUtils.isAppendCondition(arr = gtpLinks, link = link) and UrlUtils.isAppendCondition(arr = innerLinks, link = link)
       , self.allLinks))

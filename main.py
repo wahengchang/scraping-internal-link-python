@@ -10,10 +10,11 @@ from config import Config
 
 startTime = time.time()
 TARGET_DOMAIN = Config.TARGET_DOMAIN
+COOKIES = Config.COOKIES
 PROJECT_NAME = Config.PROJECT_NAME
 CATEGORY_LIST = Config.CATEGORY_LIST
-PATH_RESULT = '%s_result.txt' % PROJECT_NAME  #result
-PATH_GTP = '%s_gtp.txt' % PROJECT_NAME        #going to parse
+PATH_RESULT = './temp/%s_result.txt' % PROJECT_NAME  #result
+PATH_GTP = './temp/%s_gtp.txt' % PROJECT_NAME        #going to parse
 
 def init():
   if not Path(PATH_RESULT).is_file():
@@ -32,14 +33,15 @@ def processUrl(__url):
     url = __url, 
     innerLinks = FileHelper.readFileToList(PATH_RESULT), 
     gtpLinks = FileHelper.readFileToList(PATH_GTP), 
-    options= {"domain": TARGET_DOMAIN}
+    options= {"domain": TARGET_DOMAIN},
+    cookies = COOKIES
   )
 
   sp.processLinks()
 
   print('[INFO] Found %d new allLinks' % len(sp.allLinks))
-  # for newlink in sp.allLinks:
-  #   print(newlink)
+  for newlink in sp.allLinks:
+    print(newlink)
   print('[INFO] Found %d new newInnerLinks' % len(sp.newInnerLinks))
   print('[INFO] Found %d new newgtpLinks' % len(sp.newgtpLinks))
 

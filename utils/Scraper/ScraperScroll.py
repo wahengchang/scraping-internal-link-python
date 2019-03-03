@@ -4,9 +4,10 @@ import time
 
 class ScraperScroll(Scraper):
   def preFetchHtml(self, driver):
+    driver.save_screenshot('{0}-0.png'.format(time.time()))
+    
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight/2);")
     time.sleep(1)
-    driver.save_screenshot('{0}-0.png'.format(time.time()))
 
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(1)

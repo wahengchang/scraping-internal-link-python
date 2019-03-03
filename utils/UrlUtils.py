@@ -31,6 +31,6 @@ class UrlUtils:
       if not isRepeat(arr, link) and not isEmail(link) and not isEmpty(link) and UrlUtils.isSameDomain(link):
         return True
       else :
-        return False
+        return ''
     except:
-      return False
+      return ''
