@@ -10,7 +10,8 @@ from config import Config
 
 startTime = time.time()
 TARGET_DOMAIN = Config.TARGET_DOMAIN
-COOKIES = Config.COOKIES
+COOKIES = getattr(Config, 'COOKIES', [])
+
 PROJECT_NAME = Config.PROJECT_NAME
 CATEGORY_LIST = Config.CATEGORY_LIST
 PATH_RESULT = './temp/%s_result.txt' % PROJECT_NAME  #result
@@ -29,19 +30,24 @@ def init():
       processUrl('{0}/{1}'.format(TARGET_DOMAIN, subUrlTag))
 
 def processUrl(__url):
+  options= {
+    "domain": TARGET_DOMAIN,
+    "saveHtml": Config.SAVE_HTML if hasattr(Config, 'SAVE_HTML') else False
+  }
+
   sp = ScraperScroll(
     url = __url, 
     innerLinks = FileHelper.readFileToList(PATH_RESULT), 
     gtpLinks = FileHelper.readFileToList(PATH_GTP), 
-    options= {"domain": TARGET_DOMAIN},
+    options = options,
     cookies = COOKIES
   )
 
   sp.processLinks()
 
   print('[INFO] Found %d new allLinks' % len(sp.allLinks))
-  for newlink in sp.allLinks:
-    print(newlink)
+  # for newlink in sp.allLinks:
+  #   print(newlink)
   print('[INFO] Found %d new newInnerLinks' % len(sp.newInnerLinks))
   print('[INFO] Found %d new newgtpLinks' % len(sp.newgtpLinks))
 

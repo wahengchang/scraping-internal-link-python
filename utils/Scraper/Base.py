@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from utils.FileHelper import FileHelper
 from utils.UrlUtils import UrlUtils
 
 def joinList(arr1 = [], arr2 = []):
@@ -34,8 +33,11 @@ class Scraper:
   def parseHtml(self, html):
     bs = BeautifulSoup(html, 'html.parser')
     return bs.find_all('a')
+    
+  def afterParseAllLinks(self, allLinks):
+    return self.allLinks
 
-  def preFetchHtml(self, driver):
+  def afterFetchHtml(self, driver):
     return
 
   def initCookie (self, driver, url):
@@ -52,7 +54,10 @@ class Scraper:
 
 
   def fetchHtml (self):
-    url =  '{0}{1}'.format(self.options["domain"], self.url) if self.url.startswith('/') else self.url
+    domain = self.options["domain"]
+    saveHtml = self.options["saveHtml"]
+    _url = self.url
+    url =  '{0}{1}'.format(domain, _url) if _url.startswith('/') else _url
     driver = webdriver.Remote("http://127.0.0.1:4444/wd/hub", DesiredCapabilities.CHROME)
 
     self.initCookie(driver, url)
@@ -60,13 +65,14 @@ class Scraper:
     driver.get(url)
     print('[INFO] processing %s' % url)
     time.sleep(2)
-    self.preFetchHtml(driver)
+    self.afterFetchHtml(driver)
     html = driver.page_source
     driver.quit()
 
-    f = open('helloworld.html','a')
-    f.write(html)
-    f.close()
+    if saveHtml :
+      f = open(UrlUtils.onlyAzAndDigit(domain) + '.html','a')
+      f.write(html)
+      f.close()
 
     return html
 
@@ -93,6 +99,8 @@ class Scraper:
         self.allLinks.append(href)
 
     self.allLinks = joinList(self.allLinks, []) # unique
+    self.allLinks = self.afterParseAllLinks(self.allLinks)
+
     self.newInnerLinks = list(filter(lambda link: UrlUtils.isAppendCondition(arr = innerLinks, link = link), self.allLinks))
 
     self.newgtpLinks = list(filter(

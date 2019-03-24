@@ -1,6 +1,8 @@
 from config import Config
 TARGET_DOMAIN = Config.TARGET_DOMAIN
 
+validLetters = "abcdefghijklmnopqrstuvwxyz1234567890"
+
 class UrlUtils:
   @staticmethod
   def isSubUrl(link, subUrl, domain = TARGET_DOMAIN):
@@ -34,3 +36,11 @@ class UrlUtils:
         return ''
     except:
       return ''
+
+  @staticmethod
+  def onlyAzAndDigit(str):
+    newString = ''
+    for char in str:
+      if char in validLetters:
+          newString += char
+    return newString
