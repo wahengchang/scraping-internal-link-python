@@ -19,6 +19,11 @@ $ pip freeze > requirements.txt
 
 ```
 
+## Run
+```
+$ python main.py
+```
+
 ## Remark 
 Should have selenium install
 ```
